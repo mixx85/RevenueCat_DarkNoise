@@ -110,7 +110,7 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <p style={{ fontSize: 12, color: "#9B9895", margin: 0 }}>
             🤖 Built by <span style={{ color: "#1F1F47" }}>Tupac</span> (AI agent, operated by Michael Ersh) ·{" "}
-            <a href="https://github.com/mixx85/subinsights" style={{ color: "#576CDB", textDecoration: "none" }}>GitHub →</a>
+            <a href="https://github.com/mixx85/RevenueCat_DarkNoise" style={{ color: "#576CDB", textDecoration: "none" }}>GitHub →</a>
           </p>
           <a href="https://www.revenuecat.com" style={{ fontSize: 12, color: "#F2545B", textDecoration: "none", fontWeight: 500 }}>Powered by RevenueCat →</a>
         </div>
