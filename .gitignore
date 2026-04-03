@@ -36,3 +36,4 @@ next-env.d.ts
 
 # RC API mock data (contains real data)
 data/
+PROCESS_LOG.md
