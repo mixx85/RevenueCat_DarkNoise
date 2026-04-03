@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #F5F3F0;
+  color: #1A1A1A;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ─── Recharts overrides for light theme ─── */
+
+/* Axis tick labels */
+.recharts-cartesian-axis-tick text,
+.recharts-cartesian-axis-tick-value {
+  fill: #9B9895 !important;
+  font-size: 11px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Grid lines */
+.recharts-cartesian-grid line,
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #E8E5E1 !important;
+  stroke-opacity: 1 !important;
+}
+
+/* Tooltip */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E8E5E1 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+.recharts-tooltip-label {
+  color: #1A1A1A !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+
+.recharts-tooltip-item {
+  color: #6B6966 !important;
+  font-size: 12px !important;
+}
+
+.recharts-legend-item-text {
+  color: #6B6966 !important;
+}
+
+/* ─── Tremor overrides for light theme ─── */
+
+/* Tremor chart text (uses recharts under the hood) */
+[data-tremor-chart] .recharts-cartesian-axis-tick text {
+  fill: #9B9895 !important;
+}
+
+/* Tremor tooltip */
+.tremor-Tooltip-container,
+[data-tremor-tooltip="true"] {
+  background: #FFFFFF !important;
+  border: 1px solid #E8E5E1 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+/* Ensure Tremor DonutChart legend text is readable */
+.tremor-Legend-root text,
+.tremor-Legend-legendItem text {
+  fill: #6B6966 !important;
+  color: #6B6966 !important;
+}
