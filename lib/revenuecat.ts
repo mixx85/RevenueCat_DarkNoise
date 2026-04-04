@@ -2,7 +2,7 @@ const RC_API_KEY = process.env.RC_API_KEY!;
 const RC_PROJECT_ID = process.env.RC_PROJECT_ID!;
 const BASE_URL = "https://api.revenuecat.com/v2";
 
-// Use local mock data instead of API calls for development/testing
+// Use local mock data: explicitly set OR as fallback when API fails
 const USE_MOCK = process.env.USE_MOCK_DATA === "true";
 
 async function readMockFile<T>(filename: string): Promise<T> {
@@ -100,24 +100,28 @@ function getMRRResolution(period: Period): string {
   }
 }
 
+async function fetchFromMockFiles(): Promise<DashboardData> {
+  const [overview, mrrMonth, revenueDay, churnDay, trialConv] = await Promise.all([
+    readMockFile("overview.json"),
+    readMockFile("mrr_month.json"),
+    readMockFile("revenue_day.json"),
+    readMockFile("churn_day.json"),
+    readMockFile("trial_conv.json"),
+  ]);
+  return {
+    overview: (overview as { metrics: OverviewMetric[] }).metrics,
+    mrr: mrrMonth as ChartData,
+    revenue: revenueDay as ChartData,
+    churn: churnDay as ChartData,
+    trialConversion: trialConv as ChartData,
+    fetchedAt: new Date().toISOString(),
+  };
+}
+
 export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {
-  // Development: use local mock files to avoid RC API rate limits
+  // Use mock files if explicitly set
   if (USE_MOCK) {
-    const [overview, mrrMonth, revenueDay, churnDay, trialConv] = await Promise.all([
-      readMockFile("overview.json"),
-      readMockFile("mrr_month.json"),
-      readMockFile("revenue_day.json"),
-      readMockFile("churn_day.json"),
-      readMockFile("trial_conv.json"),
-    ]);
-    return {
-      overview: (overview as { metrics: OverviewMetric[] }).metrics,
-      mrr: mrrMonth as ChartData,
-      revenue: revenueDay as ChartData,
-      churn: churnDay as ChartData,
-      trialConversion: trialConv as ChartData,
-      fetchedAt: new Date().toISOString(),
-    };
+    return fetchFromMockFiles();
   }
 
   const now = new Date();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KPICards } from "./KPICards";
 import { WeeklyMemo } from "./WeeklyMemo";
 import { MRRChartClient } from "./MRRChartClient";
@@ -19,6 +19,17 @@ const RANGES: { label: string; value: Period }[] = [
   { label: "ALL", value: "all" },
 ];
 
+// Demo mode highlight — RC red glow
+function demoStyle(active: boolean): React.CSSProperties {
+  if (!active) return {};
+  return {
+    outline: "3px solid #F2545B",
+    boxShadow: "0 0 0 4px rgba(242,84,91,0.15), 0 0 32px rgba(242,84,91,0.1)",
+    borderRadius: 12,
+    transition: "all 0.4s ease",
+  };
+}
+
 export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
   periods: PeriodData;
   memo: string;
@@ -26,7 +37,34 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
   isLive: boolean;
 }) {
   const [period, setPeriod] = useState<Period>("all");
+  const [activeBlock, setActiveBlock] = useState<string | null>(null);
+  const [isDemo, setIsDemo] = useState(false);
+
   const metrics = periods[period];
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("demo") === "1") {
+      setIsDemo(true);
+    }
+    // Allow external script to drive highlights
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{ block: string | null }>;
+      setActiveBlock(ce.detail.block);
+    };
+    window.addEventListener("demo-highlight", handler);
+    return () => window.removeEventListener("demo-highlight", handler);
+  }, []);
+
+  // Helper: expose highlight trigger to console for mouse script
+  useEffect(() => {
+    if (!isDemo) return;
+    (window as any).demoHighlight = (block: string | null) => {
+      window.dispatchEvent(new CustomEvent("demo-highlight", { detail: { block } }));
+    };
+  }, [isDemo]);
+
+  const d = (block: string) => isDemo ? demoStyle(activeBlock === block) : {};
 
   return (
     <div style={{ minHeight: "100vh", background: "#F5F3F0", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -68,14 +106,18 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* KPI — always current snapshot */}
-          <KPICards metrics={metrics} />
+          {/* KPI Cards */}
+          <div style={{ ...d("kpi"), borderRadius: 12 }}>
+            <KPICards metrics={metrics} />
+          </div>
 
           {/* AI Weekly Memo */}
-          <WeeklyMemo memo={memo} fetchedAt={fetchedAt} />
+          <div style={d("memo")}>
+            <WeeklyMemo memo={memo} fetchedAt={fetchedAt} />
+          </div>
 
           {/* Range selector */}
-          <div style={{ background: "#FFFFFF", border: "1px solid #E8E5E1", borderRadius: 12, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E8E5E1", borderRadius: 12, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", ...d("range") }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>Time range</span>
             <div style={{ display: "flex", gap: 4, background: "#F5F3F0", borderRadius: 8, padding: 3 }}>
               {RANGES.map(({ label, value }) => {
@@ -97,11 +139,19 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
             </div>
           </div>
 
-          {/* Charts — instant switch, no server round-trip */}
-          <MRRChartClient data={metrics.mrrSeries} defaultRange={period} />
+          {/* MRR Chart */}
+          <div style={d("mrr")}>
+            <MRRChartClient data={metrics.mrrSeries} defaultRange={period} />
+          </div>
+
+          {/* Funnel + Churn */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <FunnelChart data={metrics.funnel} period={period} />
-            <ChurnChart churnSeries={metrics.churnSeries} activeSubs={metrics.activeSubs} activeTrials={metrics.activeTrials} period={period} />
+            <div style={d("funnel")}>
+              <FunnelChart data={metrics.funnel} period={period} />
+            </div>
+            <div style={d("churn")}>
+              <ChurnChart churnSeries={metrics.churnSeries} activeSubs={metrics.activeSubs} activeTrials={metrics.activeTrials} period={period} />
+            </div>
           </div>
         </div>
       </div>
@@ -115,6 +165,13 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
           <a href="https://www.revenuecat.com" style={{ fontSize: 12, color: "#F2545B", textDecoration: "none", fontWeight: 500 }}>Powered by RevenueCat →</a>
         </div>
       </div>
+
+      {/* Demo mode indicator */}
+      {isDemo && (
+        <div style={{ position: "fixed", bottom: 16, right: 16, background: "#F2545B", color: "#fff", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, zIndex: 999 }}>
+          DEMO MODE
+        </div>
+      )}
     </div>
   );
 }

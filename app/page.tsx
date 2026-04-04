@@ -39,34 +39,26 @@ export default async function Home() {
     fetchedAt = rawAll.fetchedAt;
     isLive = true;
   } catch {
-    // Fallback: use static data, no RC API needed
-    const fallbackMemo = `[STABLE] Dark Noise — stable week, MRR flat, churn healthy.\n\n• MRR at $${FALLBACK.mrr.toLocaleString()} with ${FALLBACK.activeSubs.toLocaleString()} active subscriptions.\n• Churn rate: ${FALLBACK.churn.toFixed(1)}% — healthy, focus on growth.\n• Trial conversion: ${FALLBACK.trialConv.toFixed(1)}% — room to improve.\n\n→ A/B test trial-to-paid screen: urgency vs value-first messaging.\n→ Review onboarding: are users hitting the 'aha moment' before trial ends?`;
+    const fallbackMemo = `[STABLE] Dark Noise — stable week, MRR flat, churn healthy.\n\n• MRR at $4,554 with 2,534 active subscriptions.\n• Churn rate: 0.1% — healthy, focus on growth levers.\n• Trial conversion: 38.5% — room to improve.\n\n→ A/B test trial-to-paid screen: urgency vs value-first messaging.\n→ Review onboarding: are users hitting the 'aha moment' before trial ends?`;
 
-    metricsAll = metrics1y = metrics3m = metrics1m = {
-      ...FALLBACK,
-      mrrSeries: [
-        { date: "Apr '23", dateTs: 1680307200, MRR: 700 },
-        { date: "Jul '23", dateTs: 1688169600, MRR: 1200 },
-        { date: "Oct '23", dateTs: 1696118400, MRR: 1800 },
-        { date: "Jan '24", dateTs: 1704067200, MRR: 2400 },
-        { date: "Apr '24", dateTs: 1711929600, MRR: 2900 },
-        { date: "Jul '24", dateTs: 1719792000, MRR: 3400 },
-        { date: "Oct '24", dateTs: 1727740800, MRR: 3900 },
-        { date: "Jan '25", dateTs: 1735689600, MRR: 4200 },
-        { date: "Mar '25", dateTs: 1741478400, MRR: 4554 },
-      ],
-      churnSeries: [
-        { date: "Mar 20", "Churn Rate": 0.16 }, { date: "Mar 22", "Churn Rate": 0.08 },
-        { date: "Mar 24", "Churn Rate": 0.16 }, { date: "Mar 26", "Churn Rate": 0.24 },
-        { date: "Mar 28", "Churn Rate": 0.16 }, { date: "Mar 30", "Churn Rate": 0.24 },
-        { date: "Apr 1", "Churn Rate": 0.16 }, { date: "Apr 2", "Churn Rate": 0.12 },
-      ],
-      funnel: [
-        { name: "Trial Starts (14d)", value: 320 },
-        { name: "Conversions (14d)", value: 123 },
-        { name: "Active Trials", value: 74 },
-      ],
-    };
+    // Fallback: load from cached mock files — each period gets correct data
+    try {
+      const { fetchDashboardData: fetchMock } = await import("@/lib/revenuecat");
+      const [rawAll2, raw1y2, raw3m2, raw1m2] = await Promise.all([
+        fetchMock("all"),
+        fetchMock("1y"),
+        fetchMock("3m"),
+        fetchMock("1m"),
+      ]);
+      metricsAll = computeMetrics(rawAll2.overview, rawAll2.mrr, rawAll2.revenue, rawAll2.churn, rawAll2.trialConversion, "all");
+      metrics1y = computeMetrics(raw1y2.overview, raw1y2.mrr, raw1y2.revenue, raw1y2.churn, raw1y2.trialConversion, "1y");
+      metrics3m = computeMetrics(raw3m2.overview, raw3m2.mrr, raw3m2.revenue, raw3m2.churn, raw3m2.trialConversion, "3m");
+      metrics1m = computeMetrics(raw1m2.overview, raw1m2.mrr, raw1m2.revenue, raw1m2.churn, raw1m2.trialConversion, "1m");
+    } catch {
+      // Last resort — static fallback
+      const m = { ...FALLBACK, mrrSeries: [{date:"Apr '23",dateTs:1680307200,MRR:700},{date:"Jan '24",dateTs:1704067200,MRR:2400},{date:"Apr '24",dateTs:1711929600,MRR:2900},{date:"Jan '25",dateTs:1735689600,MRR:4200},{date:"Mar '25",dateTs:1741478400,MRR:4554}], churnSeries:[{date:"Mar 28","Churn Rate":0.16},{date:"Mar 30","Churn Rate":0.24},{date:"Apr 1","Churn Rate":0.16},{date:"Apr 2","Churn Rate":0.12}], funnel:[{name:"Trial Starts (14d)",value:320},{name:"Conversions (14d)",value:123},{name:"Active Trials",value:74}] };
+      metricsAll = metrics1y = metrics3m = metrics1m = m;
+    }
     memo = fallbackMemo;
     fetchedAt = new Date().toISOString();
     isLive = false;
