@@ -43,6 +43,8 @@ export default async function Home() {
 
     // Fallback: load from cached mock files — each period gets correct data
     try {
+      // Force mock mode to read per-period cached files
+      process.env.USE_MOCK_DATA = "true";
       const { fetchDashboardData: fetchMock } = await import("@/lib/revenuecat");
       const [rawAll2, raw1y2, raw3m2, raw1m2] = await Promise.all([
         fetchMock("all"),

@@ -100,17 +100,18 @@ function getMRRResolution(period: Period): string {
   }
 }
 
-async function fetchFromMockFiles(): Promise<DashboardData> {
-  const [overview, mrrMonth, revenueDay, churnDay, trialConv] = await Promise.all([
+async function fetchFromMockFiles(period: Period = "all"): Promise<DashboardData> {
+  const mrrFile = `mrr_${period}.json`;
+  const [overview, mrrData, revenueDay, churnDay, trialConv] = await Promise.all([
     readMockFile("overview.json"),
-    readMockFile("mrr_month.json"),
+    readMockFile(mrrFile).catch(() => readMockFile("mrr_month.json")),
     readMockFile("revenue_day.json"),
     readMockFile("churn_day.json"),
     readMockFile("trial_conv.json"),
   ]);
   return {
     overview: (overview as { metrics: OverviewMetric[] }).metrics,
-    mrr: mrrMonth as ChartData,
+    mrr: mrrData as ChartData,
     revenue: revenueDay as ChartData,
     churn: churnDay as ChartData,
     trialConversion: trialConv as ChartData,
@@ -121,7 +122,7 @@ async function fetchFromMockFiles(): Promise<DashboardData> {
 export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {
   // Use mock files if explicitly set
   if (USE_MOCK) {
-    return fetchFromMockFiles();
+    return fetchFromMockFiles(period);
   }
 
   const now = new Date();
