@@ -189,7 +189,7 @@ Core value: **faster understanding**, not more dashboards.
 
 ## Process Log
 
-**Full doc:** `memory/scratchpad/subinsights-process-doc.md`
+**→ https://github.com/mixx85/RevenueCat-DarkNoise/blob/main/docs/PROCESS_LOG.md**
 
 ### Team
 - **Tupac** — main operator, orchestrator, code reviewer, content author
