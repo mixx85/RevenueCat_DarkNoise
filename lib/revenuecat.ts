@@ -119,45 +119,78 @@ async function fetchFromMockFiles(period: Period = "all"): Promise<DashboardData
   };
 }
 
-export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {
-  // Use mock files if explicitly set
+// Fetch all-time baseline data (overview + slow-changing charts)
+// These are fetched ONCE and shared across all periods
+export interface BaselineData {
+  overview: OverviewMetric[];
+  revenue: ChartData;    // all-time daily — client filters by period
+  churn: ChartData;      // all-time daily — client filters by period
+  trialConversion: ChartData; // all-time daily — client filters by period
+  fetchedAt: string;
+}
+
+export async function fetchBaseline(): Promise<BaselineData> {
   if (USE_MOCK) {
-    return fetchFromMockFiles(period);
+    const [overview, revenueDay, churnDay, trialConv] = await Promise.all([
+      readMockFile("overview.json"),
+      readMockFile("revenue_day.json"),
+      readMockFile("churn_day.json"),
+      readMockFile("trial_conv.json"),
+    ]);
+    return {
+      overview: (overview as { metrics: OverviewMetric[] }).metrics,
+      revenue: revenueDay as ChartData,
+      churn: churnDay as ChartData,
+      trialConversion: trialConv as ChartData,
+      fetchedAt: new Date().toISOString(),
+    };
   }
 
   const now = new Date();
   const end = now.toISOString();
-  const startPeriod = getPeriodStart(period);
-  const mrrResolution = getMRRResolution(period);
+  const start = new Date("2023-04-01").toISOString();
 
   const overviewRaw = await rcFetch(`/projects/${RC_PROJECT_ID}/metrics/overview`) as { metrics: OverviewMetric[] };
-  await new Promise((r) => setTimeout(r, 300));
-
-  const mrrRaw = await rcFetch(
-    `/projects/${RC_PROJECT_ID}/charts/mrr?resolution=${mrrResolution}&start_time=${startPeriod}&end_time=${end}`
-  ) as ChartData;
-  await new Promise((r) => setTimeout(r, 300));
-
-  const revenueRaw = await rcFetch(
-    `/projects/${RC_PROJECT_ID}/charts/revenue?resolution=day&start_time=${startPeriod}&end_time=${end}`
-  ) as ChartData;
-  await new Promise((r) => setTimeout(r, 300));
-
-  const churnRaw = await rcFetch(
-    `/projects/${RC_PROJECT_ID}/charts/churn?resolution=day&start_time=${startPeriod}&end_time=${end}`
-  ) as ChartData;
-  await new Promise((r) => setTimeout(r, 300));
-
-  const trialConversionRaw = await rcFetch(
-    `/projects/${RC_PROJECT_ID}/charts/trial_conversion_rate?resolution=day&start_time=${startPeriod}&end_time=${end}`
-  ) as ChartData;
+  await new Promise(r => setTimeout(r, 400));
+  const revenueRaw = await rcFetch(`/projects/${RC_PROJECT_ID}/charts/revenue?resolution=day&start_time=${start}&end_time=${end}`) as ChartData;
+  await new Promise(r => setTimeout(r, 400));
+  const churnRaw = await rcFetch(`/projects/${RC_PROJECT_ID}/charts/churn?resolution=day&start_time=${start}&end_time=${end}`) as ChartData;
+  await new Promise(r => setTimeout(r, 400));
+  const trialConvRaw = await rcFetch(`/projects/${RC_PROJECT_ID}/charts/trial_conversion_rate?resolution=day&start_time=${start}&end_time=${end}`) as ChartData;
 
   return {
     overview: overviewRaw.metrics,
-    mrr: mrrRaw,
     revenue: revenueRaw,
     churn: churnRaw,
-    trialConversion: trialConversionRaw,
+    trialConversion: trialConvRaw,
     fetchedAt: now.toISOString(),
   };
+}
+
+// Fetch only MRR chart for a specific period (different resolution per period)
+export async function fetchMRRForPeriod(period: Period): Promise<ChartData> {
+  if (USE_MOCK) {
+    const mrrFile = `mrr_${period}.json`;
+    const data = await readMockFile(mrrFile).catch(() => readMockFile("mrr_month.json"));
+    return data as ChartData;
+  }
+
+  const now = new Date();
+  const end = now.toISOString();
+  const start = getPeriodStart(period);
+  const resolution = getMRRResolution(period);
+
+  return await rcFetch(
+    `/projects/${RC_PROJECT_ID}/charts/mrr?resolution=${resolution}&start_time=${start}&end_time=${end}`
+  ) as ChartData;
+}
+
+// Legacy function — kept for compatibility with mock fallback in page.tsx catch block
+export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {
+  if (USE_MOCK) {
+    return fetchFromMockFiles(period);
+  }
+  // In live mode: use fetchBaseline + fetchMRRForPeriod instead
+  // This function should only be called in mock/fallback mode
+  throw new Error("Use fetchBaseline() + fetchMRRForPeriod() for live data");
 }
