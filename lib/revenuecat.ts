@@ -119,6 +119,17 @@ async function fetchFromMockFiles(period: Period = "all"): Promise<DashboardData
   };
 }
 
+// Normalize timestamp to current hour — ensures fetch-cache hits across hot reloads
+// Without this, every call produces a unique URL (ms precision) = cache miss = 429
+function hourBoundary(): string {
+  return new Date(Math.floor(Date.now() / 3600000) * 3600000).toISOString().replace(/\.\d{3}Z$/, '.000Z');
+}
+
+// Normalize start_time to day boundary for period-based queries
+function dayBoundary(iso: string): string {
+  return iso.slice(0, 10) + 'T00:00:00.000Z';
+}
+
 // Fetch all-time baseline data (overview + slow-changing charts)
 // These are fetched ONCE and shared across all periods
 export interface BaselineData {
@@ -146,8 +157,8 @@ export async function fetchBaseline(): Promise<BaselineData> {
     };
   }
 
-  const now = new Date();
-  const end = now.toISOString();
+  // Normalized timestamps — same URL for all requests within this hour
+  const end = hourBoundary();
   const start = new Date("2023-04-01").toISOString();
 
   const overviewRaw = await rcFetch(`/projects/${RC_PROJECT_ID}/metrics/overview`) as { metrics: OverviewMetric[] };
@@ -163,7 +174,7 @@ export async function fetchBaseline(): Promise<BaselineData> {
     revenue: revenueRaw,
     churn: churnRaw,
     trialConversion: trialConvRaw,
-    fetchedAt: now.toISOString(),
+    fetchedAt: new Date().toISOString(),
   };
 }
 
@@ -175,15 +186,18 @@ export async function fetchMRRForPeriod(period: Period): Promise<ChartData> {
     return data as ChartData;
   }
 
-  const now = new Date();
-  const end = now.toISOString();
-  const start = getPeriodStart(period);
+  // Normalized timestamps — same URL within the hour
+  const end = hourBoundary();
+  const start = dayBoundary(getPeriodStart(period));
   const resolution = getMRRResolution(period);
 
   return await rcFetch(
     `/projects/${RC_PROJECT_ID}/charts/mrr?resolution=${resolution}&start_time=${start}&end_time=${end}`
   ) as ChartData;
 }
+
+// Export for direct use in fallback (avoids module-level USE_MOCK constant issue)
+export { fetchFromMockFiles };
 
 // Fallback-only function: always reads from mock files (used in catch block)
 export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {

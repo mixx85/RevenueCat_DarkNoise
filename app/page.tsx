@@ -1,4 +1,4 @@
-import { fetchBaseline, fetchMRRForPeriod, fetchDashboardData } from "@/lib/revenuecat";
+import { fetchBaseline, fetchMRRForPeriod, fetchFromMockFiles } from "@/lib/revenuecat";
 import { computeMetrics } from "@/lib/compute";
 import { generateMemo } from "@/lib/insights";
 import { DashboardClient } from "@/components/DashboardClient";
@@ -40,15 +40,17 @@ export default async function Home() {
     fetchedAt = baseline.fetchedAt;
     isLive = true;
 
-  } catch {
+  } catch (err) {
+    console.error('[SubInsights] RC API fetch failed:', err instanceof Error ? err.message : String(err));
     // Fallback: mock files per period
     const fallbackMemo = `[STABLE] Dark Noise — stable week, MRR flat, churn healthy.\n\n• MRR at $4,554 with 2,534 active subscriptions.\n• Churn rate: 0.1% — healthy, focus on growth levers.\n• Trial conversion: 38.5% — room to improve.\n\n→ A/B test trial-to-paid screen: urgency vs value-first messaging.\n→ Review onboarding: are users hitting the 'aha moment' before trial ends?`;
 
     try {
-      // Use mock files directly — no dynamic import (breaks webpack module cache)
+      // Use mock files directly via exported fetchFromMockFiles
+      // (avoids USE_MOCK module-level constant that can't be changed at runtime)
       const [rawAll, raw1y, raw3m, raw1m] = await Promise.all([
-        fetchDashboardData("all"), fetchDashboardData("1y"),
-        fetchDashboardData("3m"), fetchDashboardData("1m"),
+        fetchFromMockFiles("all"), fetchFromMockFiles("1y"),
+        fetchFromMockFiles("3m"), fetchFromMockFiles("1m"),
       ]);
       metricsAll = computeMetrics(rawAll.overview, rawAll.mrr, rawAll.revenue, rawAll.churn, rawAll.trialConversion, "all");
       metrics1y  = computeMetrics(raw1y.overview,  raw1y.mrr,  raw1y.revenue,  raw1y.churn,  raw1y.trialConversion,  "1y");
