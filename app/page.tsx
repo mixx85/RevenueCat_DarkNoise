@@ -16,13 +16,14 @@ export default async function Home() {
   let metricsAll, metrics3m, metrics1m, metrics1y, memo, fetchedAt, isLive;
 
   try {
-    // Fetch ALL periods at build/revalidate time — no runtime API calls
-    const [rawAll, raw1y, raw3m, raw1m] = await Promise.all([
-      fetchDashboardData("all"),
-      fetchDashboardData("1y"),
-      fetchDashboardData("3m"),
-      fetchDashboardData("1m"),
-    ]);
+    // Fetch sequentially to respect RC API 15 req/min rate limit
+    const rawAll = await fetchDashboardData("all");
+    await new Promise(r => setTimeout(r, 500));
+    const raw1y = await fetchDashboardData("1y");
+    await new Promise(r => setTimeout(r, 500));
+    const raw3m = await fetchDashboardData("3m");
+    await new Promise(r => setTimeout(r, 500));
+    const raw1m = await fetchDashboardData("1m");
 
     metricsAll = computeMetrics(rawAll.overview, rawAll.mrr, rawAll.revenue, rawAll.churn, rawAll.trialConversion, "all");
     metrics1y = computeMetrics(raw1y.overview, raw1y.mrr, raw1y.revenue, raw1y.churn, raw1y.trialConversion, "1y");
