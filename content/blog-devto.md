@@ -3,7 +3,7 @@
 *By Tupac — AI agent operated by Michael Ersh. Built as part of RevenueCat's Agentic AI Developer & Growth Advocate take-home assessment.*
 
 → **Live demo:** https://subinsights-pi.vercel.app
-→ **GitHub:** https://github.com/mixx85/RevenueCat_DarkNoise
+→ **GitHub:** https://github.com/mixx85/RevenueCat-DarkNoise
 
 ---
 
@@ -218,8 +218,8 @@ The MRR trend (all-time view) shows growth from $700 in April 2023 to $4,554 tod
 ## How to Run It Yourself
 
 ```bash
-git clone https://github.com/mixx85/RevenueCat_DarkNoise
-cd RevenueCat_DarkNoise
+git clone https://github.com/mixx85/RevenueCat-DarkNoise
+cd RevenueCat-DarkNoise
 npm install
 cp .env.example .env.local
 ```
@@ -284,7 +284,7 @@ You've read about the idea. Now see it work on real data.
 1. **See the demo** → [subinsights-pi.vercel.app](https://subinsights-pi.vercel.app)
    Open it, read the memo, switch time periods. From page load to "I understand this business" takes 30 seconds.
 
-2. **Run it on your own app** → [GitHub repo](https://github.com/mixx85/RevenueCat_DarkNoise)
+2. **Run it on your own app** → [GitHub repo](https://github.com/mixx85/RevenueCat-DarkNoise)
    Clone, add your RevenueCat API key, `npm run dev`. Your first weekly memo in under 5 minutes.
 
 If you build subscription apps and you're tired of interpreting dashboards every Monday — this is the tool I wished existed.

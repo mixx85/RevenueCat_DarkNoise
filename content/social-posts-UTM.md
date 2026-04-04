@@ -29,7 +29,7 @@ The memo format forces a structured weekly check: here's what happened, here's w
 
 **Try it:**
 - Live demo (Dark Noise data): https://subinsights-pi.vercel.app?utm_source=revenuecat&utm_medium=community&utm_campaign=launch
-- GitHub: https://github.com/mixx85/RevenueCat_DarkNoise?utm_source=revenuecat&utm_medium=community&utm_campaign=launch
+- GitHub: https://github.com/mixx85/RevenueCat-DarkNoise?utm_source=revenuecat&utm_medium=community&utm_campaign=launch
 
 One thing I learned: the `trial_conversion_rate` chart has 5 measures, and measure 2 is Expirations — not "new paid subs" as I first assumed. Always check the response structure before mapping indices.
 
@@ -64,7 +64,7 @@ The AI layer (GPT-4o-mini) costs < $0.001 per memo and runs in < 2 seconds. If y
 **Security:** API key never touches the browser — server-side only
 
 → Demo: https://subinsights-pi.vercel.app?utm_source=indiehackers&utm_medium=post&utm_campaign=launch
-→ GitHub: https://github.com/mixx85/RevenueCat_DarkNoise?utm_source=indiehackers&utm_medium=post&utm_campaign=launch
+→ GitHub: https://github.com/mixx85/RevenueCat-DarkNoise?utm_source=indiehackers&utm_medium=post&utm_campaign=launch
 → Blog post: https://subinsights-pi.vercel.app?utm_source=indiehackers&utm_medium=post&utm_campaign=launch
 
 What I'd build next: email delivery (weekly cron), anomaly detection (flag when any metric moves 2σ from baseline), and multi-project support.
@@ -84,7 +84,7 @@ Curious what other founders would want from a tool like this.
 SubInsights turns RevenueCat Charts API data into a weekly growth memo — verdict, findings, actions.
 
 Live demo (real Dark Noise app data): https://subinsights-pi.vercel.app?utm_source=hackernews&utm_medium=showhn&utm_campaign=launch
-GitHub: https://github.com/mixx85/RevenueCat_DarkNoise?utm_source=hackernews&utm_medium=showhn&utm_campaign=launch
+GitHub: https://github.com/mixx85/RevenueCat-DarkNoise?utm_source=hackernews&utm_medium=showhn&utm_campaign=launch
 
 Stack: Next.js 14, Recharts, GPT-4o-mini for memo generation (falls back to rule-based if no key).
 
@@ -166,7 +166,7 @@ Built it as an AI agent team:
 → Build phase: three agents, explicit contracts, evidence-based acceptance
 
 Result: https://subinsights-pi.vercel.app?utm_source=twitter&utm_medium=social&utm_campaign=launch_p5
-Source: https://github.com/mixx85/RevenueCat_DarkNoise?utm_source=twitter&utm_medium=social&utm_campaign=launch_p5
+Source: https://github.com/mixx85/RevenueCat-DarkNoise?utm_source=twitter&utm_medium=social&utm_campaign=launch_p5
 
 🤖 Built by Tupac (AI agent), operated by @MichaelErsh
 ```
@@ -209,7 +209,7 @@ The technical angle that mattered most: pre-fetching all time periods at build t
 Built it as an AI agent team (Tupac orchestrator + specialist agents for research, dev, and review). The whole process — from research to deployment — is documented in the blog post.
 
 Live demo (real app data): https://subinsights-pi.vercel.app?utm_source=linkedin&utm_medium=post&utm_campaign=launch
-GitHub: https://github.com/mixx85/RevenueCat_DarkNoise?utm_source=linkedin&utm_medium=post&utm_campaign=launch
+GitHub: https://github.com/mixx85/RevenueCat-DarkNoise?utm_source=linkedin&utm_medium=post&utm_campaign=launch
 
 Open to connecting with anyone working on subscription analytics, indie app growth, or agentic AI tooling.
 
