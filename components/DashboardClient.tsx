@@ -19,15 +19,25 @@ const RANGES: { label: string; value: Period }[] = [
   { label: "ALL", value: "all" },
 ];
 
-// Demo mode highlight — RC red glow
+// Demo mode highlight — RC red glow on hover
+const DEMO_HOVER_STYLE: React.CSSProperties = {
+  outline: "3px solid #F2545B",
+  boxShadow: "0 0 0 4px rgba(242,84,91,0.15), 0 0 32px rgba(242,84,91,0.1)",
+  borderRadius: 12,
+  transition: "outline 0.2s ease, box-shadow 0.2s ease",
+  cursor: "default",
+};
+
+const DEMO_IDLE_STYLE: React.CSSProperties = {
+  outline: "3px solid transparent",
+  boxShadow: "none",
+  borderRadius: 12,
+  transition: "outline 0.2s ease, box-shadow 0.2s ease",
+};
+
 function demoStyle(active: boolean): React.CSSProperties {
   if (!active) return {};
-  return {
-    outline: "3px solid #F2545B",
-    boxShadow: "0 0 0 4px rgba(242,84,91,0.15), 0 0 32px rgba(242,84,91,0.1)",
-    borderRadius: 12,
-    transition: "all 0.4s ease",
-  };
+  return DEMO_HOVER_STYLE;
 }
 
 export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
@@ -64,7 +74,11 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
     };
   }, [isDemo]);
 
-  const d = (block: string) => isDemo ? demoStyle(activeBlock === block) : {};
+  const d = (block: string): React.CSSProperties => isDemo ? demoStyle(activeBlock === block) : {};
+  const hover = (block: string) => isDemo ? {
+    onMouseEnter: () => setActiveBlock(block),
+    onMouseLeave: () => setActiveBlock(null),
+  } : {};
 
   return (
     <div style={{ minHeight: "100vh", background: "#F5F3F0", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -107,17 +121,17 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* KPI Cards */}
-          <div style={{ ...d("kpi"), borderRadius: 12 }}>
+          <div style={{ ...d("kpi"), borderRadius: 12 }} {...hover("kpi")}>
             <KPICards metrics={metrics} />
           </div>
 
           {/* AI Weekly Memo */}
-          <div style={d("memo")}>
+          <div style={d("memo")} {...hover("memo")}>
             <WeeklyMemo memo={memo} fetchedAt={fetchedAt} />
           </div>
 
           {/* Range selector */}
-          <div style={{ background: "#FFFFFF", border: "1px solid #E8E5E1", borderRadius: 12, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", ...d("range") }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E8E5E1", borderRadius: 12, padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", ...d("range") }} {...hover("range")}>
             <span style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>Time range</span>
             <div style={{ display: "flex", gap: 4, background: "#F5F3F0", borderRadius: 8, padding: 3 }}>
               {RANGES.map(({ label, value }) => {
@@ -140,16 +154,16 @@ export function DashboardClient({ periods, memo, fetchedAt, isLive }: {
           </div>
 
           {/* MRR Chart */}
-          <div style={d("mrr")}>
+          <div style={d("mrr")} {...hover("mrr")}>
             <MRRChartClient data={metrics.mrrSeries} defaultRange={period} />
           </div>
 
           {/* Funnel + Churn */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <div style={d("funnel")}>
+            <div style={d("funnel")} {...hover("funnel")}>
               <FunnelChart data={metrics.funnel} period={period} />
             </div>
-            <div style={d("churn")}>
+            <div style={d("churn")} {...hover("churn")}>
               <ChurnChart churnSeries={metrics.churnSeries} activeSubs={metrics.activeSubs} activeTrials={metrics.activeTrials} period={period} />
             </div>
           </div>
