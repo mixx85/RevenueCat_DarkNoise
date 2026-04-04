@@ -185,12 +185,7 @@ export async function fetchMRRForPeriod(period: Period): Promise<ChartData> {
   ) as ChartData;
 }
 
-// Legacy function — kept for compatibility with mock fallback in page.tsx catch block
+// Fallback-only function: always reads from mock files (used in catch block)
 export async function fetchDashboardData(period: Period = "all"): Promise<DashboardData> {
-  if (USE_MOCK) {
-    return fetchFromMockFiles(period);
-  }
-  // In live mode: use fetchBaseline + fetchMRRForPeriod instead
-  // This function should only be called in mock/fallback mode
-  throw new Error("Use fetchBaseline() + fetchMRRForPeriod() for live data");
+  return fetchFromMockFiles(period);
 }
