@@ -82,7 +82,7 @@ Structure:
 Script: `memory/scratchpad/subinsights-video-script.md`
 Voiceover: Nichalia voice clone (Qwen3-TTS 1.7B local), 96 sec
 
-~96 seconds. Demo mode (?demo=1) с hover-highlight на каждый блок.
+~96 seconds. Demo mode (?demo=1) with hover-highlight on each dashboard block.
 
 ---
 

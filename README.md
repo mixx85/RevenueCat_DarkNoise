@@ -102,9 +102,9 @@ Open `http://localhost:3000`. Your first weekly memo in under 5 seconds.
 - **Tupac** — main operator, orchestrator, product decisions, code review, acceptance
 - **Vasya** — fullstack developer (implementation)
 - **Kolya** — researcher, market analysis, competitor review
-- **Конь Джо 2027** — GTM operator, growth campaign, $100 budget strategy
+- **Konj Joe 2027** — GTM operator, growth campaign, $100 budget strategy
 - **Nora** — media creator, blog post storytelling, social posts
-- **Олег** — diagnostics, architecture audit, API integration review
+- **Oleg** — diagnostics, architecture audit, API integration review
 
 ---
 
